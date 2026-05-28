@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知马网调试页面</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #FF6A00;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-left: 4px solid #FF6A00;
+            background-color: #fff5f0;
+        }
+        .url-list {
+            list-style: none;
+            padding: 0;
+        }
+        .url-list li {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .url-list a {
+            color: #FF6A00;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .url-list a:hover {
+            text-decoration: underline;
+        }
+        .debug-steps {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .debug-steps ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .debug-steps li {
+            margin: 8px 0;
+        }
+        .success {
+            color: #28a745;
+        }
+        .warning {
+            color: #ffc107;
+        }
+        .error {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐎 知马网调试页面</h1>
+        
+        <div class="status-section">
+            <h2>服务器状态</h2>
+            <p>✅ Vite开发服务器正在运行</p>
+            <p>✅ 项目已成功构建</p>
+            <p>✅ 图标库已安装和配置</p>
+        </div>
+
+        <div class="status-section">
+            <h2>访问地址</h2>
+            <ul class="url-list">
+                <li>🏠 <a href="http://localhost:3000" target="_blank">主页: http://localhost:3000</a></li>
+                <li>🔧 <a href="http://localhost:3000/test" target="_blank">测试页面: http://localhost:3000/test</a></li>
+                <li>📰 <a href="http://localhost:3000/news" target="_blank">新闻页面: http://localhost:3000/news</a></li>
+                <li>🛍️ <a href="http://localhost:3000/services" target="_blank">服务页面: http://localhost:3000/services</a></li>
+            </ul>
+        </div>
+
+        <div class="status-section">
+            <h2>如果遇到白屏问题</h2>
+            <div class="debug-steps">
+                <h3>调试步骤：</h3>
+                <ol>
+                    <li>按 <strong>F12</strong> 打开浏览器开发者工具</li>
+                    <li>切换到 <strong>Console</strong> 标签页</li>
+                    <li>查看是否有红色错误信息</li>
+                    <li>刷新页面（Ctrl+R）重新加载</li>
+                    <li>检查 <strong>Network</strong> 标签页看资源是否加载成功</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="status-section">
+            <h2>常见解决方案</h2>
+            <ul>
+                <li>✔️ 清空浏览器缓存（Ctrl+Shift+R 强制刷新）</li>
+                <li>✔️ 尝试无痕浏览模式</li>
+                <li>✔️ 关闭浏览器广告拦截器</li>
+                <li>✔️ 检查防火墙是否阻止了3000端口</li>
+            </ul>
+        </div>
+
+        <div class="status-section">
+            <h2>项目信息</h2>
+            <p>📅 最后更新: 2025年9月11日</p>
+            <p>⚡ 技术栈: Vue 3 + Vite + Element Plus + Lucide Icons</p>
+            <p>🎨 主题色: 橙色系 (#FF6A00)</p>
+        </div>
+    </div>
+
+    <script>
+        // 检测服务器状态
+        document.addEventListener('DOMContentLoaded', function() {
+            // 尝试请求服务器
+            fetch('http://localhost:3000')
+                .then(response => {
+                    if (response.ok) {
+                        console.log('✅ 服务器运行正常');
+                    } else {
+                        console.log('⚠️ 服务器响应异常:', response.status);
+                    }
+                })
+                .catch(error => {
+                    console.log('❌ 无法连接到服务器:', error.message);
+                });
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,562 @@
+<template>
+  <div class="service-detail-page">
+    <div class="container">
+      <nav class="breadcrumbs">
+        <router-link to="/">首页</router-link>
+        <span class="sep">></span>
+        <router-link to="/services">知马同城</router-link>
+        <span class="sep">></span>
+        <span class="current">{{ detail?.title || '详情' }}</span>
+      </nav>
+
+      <div class="detail-layout">
+        <main class="detail-main">
+          <h1 class="detail-title" v-if="type !== 'job'">{{ detail?.title }}</h1>
+          <div class="detail-meta" v-if="type !== 'job'">
+            <span v-if="detail?.price" class="price">{{ detail.price }}<small class="unit">{{ detail?.priceUnit }}</small></span>
+            <span class="sep" v-if="detail?.price">|</span>
+            <span class="loc"><MapPin class="icon" />{{ detail?.location }}</span>
+            <span class="sep">|</span>
+            <span class="time">{{ formatTime.fromNow(detail?.created_at) }}</span>
+          </div>
+
+          <div class="gallery" v-if="galleryImages.length && type !== 'job'">
+            <img v-for="(img, idx) in galleryImages" :key="idx" :src="img" :alt="`图${idx+1}`" class="gallery-img" />
+          </div>
+
+          <!-- 不同业务详情 -->
+          <div v-if="type === 'car'" class="panel">
+            <h3>车辆信息</h3>
+            <div class="info-grid">
+              <div class="info-item" v-for="(v, k) in detail.carInfo" :key="k">
+                <span class="label">{{ k }}</span>
+                <span class="value">{{ v }}</span>
+              </div>
+            </div>
+            <h3 v-if="detail?.tags?.length">亮点配置</h3>
+            <div class="tags" v-if="detail?.tags?.length">
+              <span class="tag" v-for="(tag, i) in detail.tags" :key="i">{{ tag }}</span>
+            </div>
+            <h3>车辆描述</h3>
+            <p class="content">{{ detail?.description || '暂无描述' }}</p>
+          </div>
+
+          <div v-else-if="type === 'rent'" class="panel">
+            <h3>房源信息</h3>
+            <div class="info-grid">
+              <div class="info-item" v-for="(v, k) in (detail?.houseInfo || {})" :key="k">
+                <span class="label">{{ k }}</span>
+                <span class="value">{{ v }}</span>
+              </div>
+            </div>
+            <h3>配套设施</h3>
+            <div class="tags">
+              <span class="tag" v-for="(f, i) in (detail?.facilities || [])" :key="i">{{ f }}</span>
+            </div>
+            <h3>房源描述</h3>
+            <p class="content">{{ detail?.description || '暂无描述' }}</p>
+          </div>
+
+          <div v-else-if="type === 'service'" class="panel">
+            <h3>服务信息</h3>
+            <div class="info-grid">
+              <div class="info-item" v-for="(v, k) in (detail?.serviceInfo || {})" :key="k">
+                <span class="label">{{ k }}</span>
+                <span class="value">{{ v }}</span>
+              </div>
+            </div>
+            <h3 v-if="detail?.tags?.length">服务标签</h3>
+            <div class="tags" v-if="detail?.tags?.length">
+              <span class="tag" v-for="(tag, i) in detail.tags" :key="i">{{ tag }}</span>
+            </div>
+            <h3>服务描述</h3>
+            <p class="content">{{ detail?.description || '暂无描述' }}</p>
+          </div>
+
+          <div v-else-if="type === 'biz'" class="panel">
+            <h3>铺源信息</h3>
+            <div class="info-grid">
+              <div class="info-item" v-for="(v, k) in (detail?.shopInfo || {})" :key="k">
+                <span class="label">{{ k }}</span>
+                <span class="value">{{ v }}</span>
+              </div>
+            </div>
+            <h3>铺源描述</h3>
+            <p class="content">{{ detail?.description || '商圈核心位置，客流稳定，适合多种业态。' }}</p>
+          </div>
+
+          <div v-else class="panel job-panel">
+            <div class="job-hero">
+              <div class="job-title-wrap">
+                <h2 class="job-title">{{ detail?.title }}</h2>
+                <div class="job-hero-meta">
+                  <span class="meta-item salary">{{ detail?.price }}<small class="unit">{{ detail?.priceUnit }}</small></span>
+                  <span class="meta-item loc"><MapPin class="icon" />{{ detail?.location }}</span>
+                  <span class="meta-item time">{{ formatTime.fromNow(detail?.created_at) }}</span>
+                </div>
+                <!-- 卖点与标签紧跟在薪资/地点/时间下方，处于封面左侧 -->
+                <div class="job58-sub" v-if="detail?.subtitle">{{ detail.subtitle }}</div>
+                <div class="job58-tags" v-if="chipTags.length">
+                  <span v-for="t in chipTags" :key="t" class="chip">{{ t }}</span>
+                </div>
+              </div>
+              <img :src="detail?.cover || placeholders.jobCover(680, 360, '职位海报', detail?.id)" class="job-cover" />
+            </div>
+
+
+            
+
+            <div class="job-keyfacts">
+              <div class="fact" v-for="(v, k) in detail.jobInfo" :key="k">
+                <div class="k">{{ k }}</div>
+                <div class="v">{{ v }}</div>
+              </div>
+            </div>
+
+            <div class="job-welfare" v-if="detail?.welfare?.length">
+              <div class="section-title">福利待遇</div>
+              <div class="tags">
+                <span class="tag" v-for="(w, i) in detail.welfare" :key="i">{{ w }}</span>
+              </div>
+            </div>
+
+            <div class="job-desc">
+              <div class="section-title">职位描述</div>
+              <p class="content">{{ detail?.description || '暂无描述' }}</p>
+            </div>
+
+            <div class="job-gallery" v-if="detail?.envImages?.length">
+              <div class="section-title">环境与团队</div>
+              <div class="env-grid">
+                <img v-for="(img, i) in detail.envImages" :src="img" :key="i" class="env-img" />
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="detail-aside">
+          <div class="provider-card">
+            <img :src="detail?.provider?.avatar || 'https://picsum.photos/40/40?random=26'" class="provider-avatar" />
+            <div class="provider-name">{{ detail?.provider?.name || '匿名' }}</div>
+            <button class="contact-btn" @click="showContact = true"><Phone class="icon" /> 联系方式</button>
+              <transition name="rst-popover">
+                <div v-if="showAppQr" class="qr-popover">
+                  <div class="qr-card">
+                    <div class="qr-box">
+                      <img class="qr-image" :src="currentAppQrImage" alt="APP 下载二维码" />
+                      <span class="corner tl"></span>
+                      <span class="corner tr"></span>
+                      <span class="corner bl"></span>
+                      <span class="corner br"></span>
+                    </div>
+                    <p class="qr-title">APP 下载二维码</p>
+                    <p class="popover-text">手机扫码下载</p>
+                    <div class="download-actions">
+                      <a class="btn-download" :class="{ active: appQrPlatform==='ios' }" href="javascript:void(0)" @click.prevent="setAppPlatform('ios')">iPhone 版</a>
+                      <a class="btn-download" :class="{ active: appQrPlatform==='android' }" href="javascript:void(0)" @click.prevent="setAppPlatform('android')">Android 版</a>
+                    </div>
+                  </div>
+                </div>
+              </transition>
+            </div>
+          </div>
+
+          <div class="safety-tips">
+            <h4>安全提示</h4>
+            <ul>
+              <li>交易前核实对方身份与资质</li>
+              <li>当面交易，谨防预付定金</li>
+              <li>保留交易记录与收据</li>
+            </ul>
+            <p style="color:#888;font-size:12px;margin:8px 0 0;">平台声明：本页信息由第三方发布，平台不直接提供第一方服务，请谨慎甄别。</p>
+          </div>
+        </aside>
+      </div>
+
+      <!-- 相似推荐 -->
+      <div class="recommend">
+        <div class="rec-header">相似推荐</div>
+        <div class="rec-list">
+          <div v-for="r in recommendations" :key="r.id" class="rec-item" @click="$router.push({ name: 'ServiceDetail', params: { id: r.id }, query: { type } })">
+            <img :src="r.cover" class="rec-thumb" />
+            <div class="rec-content">
+              <div class="rec-title">{{ r.title }}</div>
+              <div class="rec-meta" v-if="r.price">{{ r.price }}<small class="unit">{{ r.unit || '' }}</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showContact" class="modal-overlay" @click="showContact=false">
+      <div class="contact-modal" @click.stop>
+        <div class="modal-header">
+          <h3>联系方式</h3>
+          <button class="close-btn" @click="showContact=false">×</button>
+        </div>
+    <div class="modal-content">
+          <div class="contact-row" v-if="detail?.provider?.phone">
+            <Phone class="icon" />
+            <span class="label">电话号码</span>
+            <span class="value">{{ detail?.provider?.phone }}</span>
+          </div>
+            <transition name="rst-popover">
+              <div v-if="showAppQr" class="qr-popover">
+                <div class="qr-card">
+                  <div class="qr-box">
+                    <img class="qr-image" :src="currentAppQrImage" alt="APP 下载二维码" />
+                    <span class="corner tl"></span>
+                    <span class="corner tr"></span>
+                    <span class="corner bl"></span>
+                    <span class="corner br"></span>
+                  </div>
+                  <p class="qr-title">APP 下载二维码</p>
+                  <p class="popover-text">手机扫码下载</p>
+                  <div class="download-actions">
+                    <a class="btn-download" :class="{ active: appQrPlatform==='ios' }" href="javascript:void(0)" @click.prevent="setAppPlatform('ios')">iPhone 版</a>
+                    <a class="btn-download" :class="{ active: appQrPlatform==='android' }" href="javascript:void(0)" @click.prevent="setAppPlatform('android')">Android 版</a>
+                  </div>
+                </div>
+              </div>
+            </transition>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </template>
+
+<script setup>
+import { ref, onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { formatTime } from '@/utils'
+import { MapPin, Phone, MessageCircle, Smartphone } from 'lucide-vue-next'
+import { placeholders } from '@/utils/placeholder'
+
+const route = useRoute()
+const id = route.params.id
+const type = computed(() => (route.query.type || 'job'))
+const showContact = ref(false)
+const detail = ref(null)
+const galleryImages = ref([])
+const recommendations = ref([])
+const showAppQr = ref(false)
+const appQrPinned = ref(false)
+const appQrPlatform = ref('ios')
+const makeAppQr = (label) => 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'><rect width='180' height='180' fill='#FF6A00'/><text x='90' y='95' text-anchor='middle' font-family='Arial, Helvetica, sans-serif' font-size='56' font-weight='bold' fill='#FFFFFF'>${label}</text></svg>`)
+const appQrImageIos = makeAppQr('iOS')
+const appQrImageAndroid = makeAppQr('Android')
+const currentAppQrImage = computed(() => appQrPlatform.value === 'ios' ? appQrImageIos : appQrImageAndroid)
+
+const generateCarDetail = (id) => ({
+  id,
+  title: '大众 帕萨特 2011款 2.0TSI DSG御尊版',
+  price: '3.8万',
+  priceUnit: '',
+  location: '吉隆坡',
+  created_at: new Date(),
+  images: ['https://picsum.photos/400/300?random=27','https://picsum.photos/400/300?random=28','https://picsum.photos/400/300?random=29'],
+  description: '车辆车况良好，保养及时，手续齐全，支持第三方检测。城市代步首选，可过户，可置换。',
+  tags: ['一手车源','急售','随时看车','精品车况'],
+  carInfo: {
+    '上牌年份': '2011年',
+    '表显里程': '12.6万公里',
+    '变速箱': '双离合',
+    '排量': '2.0T',
+    '排放标准': '国4',
+    '年检到期': '2026-05',
+    '过户次数': '1次'
+  },
+  provider: { name: '车商-李师傅', avatar: 'https://picsum.photos/40/40?random=30', phone: '138****8888', wechat: 'usedcar_jiance' }
+})
+
+const generateRentDetail = (id) => ({
+  id,
+  title: '出租玉泉营十号线丰台站三环新城8号院 规整次卧',
+  price: '1800',
+  priceUnit: 'RM/月',
+  location: '吉隆坡',
+  created_at: new Date(),
+  images: ['https://picsum.photos/400/300?random=31','https://picsum.photos/400/300?random=32'],
+  description: '房间正气规整，采光充足，家电齐全，拎包入住。邻近地铁，生活配套完善，押一付一。',
+  facilities: ['床','衣柜','空调','热水器','洗衣机','冰箱','宽带','独卫','阳台'],
+  houseInfo: {
+    '户型': '3室1厅1卫',
+    '面积': '10㎡',
+    '楼层': '中/18层',
+    '朝向': '南北',
+    '小区': '三环新城8号院',
+    '地铁': '距10号线-丰台站347m',
+    '方式': '合租/单间',
+    '装修': '精装',
+    '看房': '随时'
+  },
+  provider: { name: '经纪人-赵女士', avatar: 'https://picsum.photos/40/40?random=33', phone: '185****1234', wechat: 'rent_zhaozhao' }
+})
+
+const jobCompanies = [
+  { name: '马来西亚优选物流有限公司', letter: '物' },
+  { name: '知马餐饮集团', letter: '餐' },
+  { name: '星海科技软件', letter: '科' },
+  { name: '新城连锁商贸', letter: '商' },
+  { name: '橙子新媒体', letter: '媒' }
+]
+
+const pick = (arr, idx) => arr[idx % arr.length]
+
+const generateJobDetail = (id) => ({
+  id,
+  title: ['高薪急招 货运司机（可学徒）','连锁餐饮 服务员/后厨','电商客服 专员','普工/技工 学徒可上岗','销售顾问 高提成'][id % 5],
+  price: ['RM6000-RM12000','RM4000-RM7000','RM5000-RM9000','RM7000-RM13000'][id % 4],
+  priceUnit: '/月',
+  location: '吉隆坡',
+  created_at: new Date(),
+  subtitle: '坐岗易学 200人直招 当天面试当天上岗',
+  images: [
+    `https://picsum.photos/seed/job-${id}/680/360`,
+    `https://picsum.photos/seed/job-env-${id+1}/320/200`,
+    `https://picsum.photos/seed/job-team-${id+2}/320/200`
+  ],
+  cover: `https://picsum.photos/seed/job-cover-${id}/680/360`,
+  envImages: [
+    `https://picsum.photos/seed/job-env-${id+3}/320/200`,
+    `https://picsum.photos/seed/job-site-${id+4}/320/200`,
+    `https://picsum.photos/seed/job-team-${id+5}/320/200`
+  ],
+  description: '岗位职责：遵守岗位流程，完成到岗培训；积极与团队协作，达成目标。任职要求：吃苦耐劳，沟通顺畅；提供岗前培训与成长计划。',
+  welfare: ['包吃','包住','五险一金','周末双休','绩效奖金','带薪年假'].slice(0, 3 + (id % 3)),
+  jobInfo: {
+    '职位类型': ['司机/物流','餐饮服务','客服专员','普工/技工','销售顾问'][id % 5],
+    '经验要求': ['不限','1-3年','3-5年'][id % 3],
+    '学历要求': ['不限','大专','本科'][id % 3],
+    '招聘人数': ['3人','5人','若干'][id % 3],
+    '到岗时间': ['随时到岗','一周内','两周内'][id % 3],
+    '工作时间': ['做六休一','做五休二','排班制'][id % 3],
+    '工作地址': '吉隆坡'
+  },
+  provider: { name: pick(jobCompanies, id).name, avatar: placeholders.logo(56, pick(jobCompanies, id).letter, String(id)), phone: '130****0001', wechat: 'hr_zm_job' }
+})
+
+const generateServiceDetail = (id) => ({
+  id,
+  title: ['上门空调清洗','搬家拉货服务','家电维修','深度保洁','水电维修'][id % 5],
+  price: ['RM99','RM199','RM299'][id % 3],
+  priceUnit: '',
+  location: '吉隆坡',
+  created_at: new Date(),
+  images: ['https://picsum.photos/400/300?random=31','https://picsum.photos/400/300?random=32'],
+  description: '本地优选服务团队，明码标价，准时上门，支持线上预约与开票。适用于家庭/商户，提供标准化服务流程与售后保障。',
+  serviceInfo: {
+    '服务类型': ['清洗保洁','搬家拉货','维修安装','家庭保洁'][id % 4],
+    '服务范围': '全城上门',
+    '营业时间': '09:00-20:00',
+    '可预约': '是'
+  },
+  tags: ['上门服务','今日可约','可开发票'].slice(0, 2 + (id % 2)),
+  provider: { name: '知马本地服务商', avatar: 'https://picsum.photos/40/40?random=34', phone: '131****7788', wechat: 'service_local' }
+})
+
+const generateBizDetail = (id) => ({
+  id,
+  title: '临街旺铺 人流密集 商圈核心 低转让费',
+  price: 'RM6800',
+  priceUnit: '/月',
+  location: '吉隆坡·商圈',
+  created_at: new Date(),
+  images: ['https://picsum.photos/400/300?random=31','https://picsum.photos/400/300?random=32'],
+  description: '位置极佳，周边写字楼与社区密集，适合餐饮/零售等多种业态。可随时看铺，诚意租售。',
+  shopInfo: {
+    '面积': '60㎡',
+    '楼层': '底商/1层',
+    '类型': '临街商铺',
+    '人流': '高峰日均2万人次',
+    '配套': '上下水/天然气/外摆区',
+    '看铺': '随时'
+  },
+  provider: { name: '经纪人-陈先生', avatar: 'https://picsum.photos/40/40?random=35', phone: '139****8888', wechat: 'shop_agent' }
+})
+
+const loadDetail = async () => {
+  const t = type.value
+  if (t === 'car') detail.value = generateCarDetail(id)
+  else if (t === 'rent') detail.value = generateRentDetail(id)
+  else if (t === 'service') detail.value = generateServiceDetail(id)
+  else if (t === 'biz') detail.value = generateBizDetail(id)
+  else detail.value = generateJobDetail(id)
+  // 图片集：优先详情的 images，否则尝试从首页图组合
+  galleryImages.value = Array.isArray(detail.value?.images) && detail.value.images.length
+    ? detail.value.images
+    : [detail.value?.home_page_image_url].filter(Boolean)
+}
+
+onMounted(loadDetail)
+
+onMounted(() => {
+  // 构造同类推荐
+  const base = type.value
+  recommendations.value = Array.from({ length: 6 }).map((_, i) => ({
+    id: Number(id) + i + 1,
+    title: base === 'car' ? `优选二手车 ${i+1}` : base === 'rent' ? `性价比房源 ${i+1}` : `热门职位 ${i+1}`,
+    cover: base === 'car' ? placeholders.car(200, 130, '二手车', `${i}`) : base === 'rent' ? placeholders.house(200, 130, '房源', `${i}`) : `https://picsum.photos/seed/job-rec-${id}-${i}/200/130`,
+    price: base === 'rent' ? 'RM' + [1800, 2100, 2300, 2500][i%4] + ' /月' : base === 'car' ? ['2.8万','3.5万','5.8万'][i%3] : ['RM8000-RM16000','RM6000-RM12000'][i%2],
+    unit: base === 'rent' ? '' : ''
+  }))
+})
+
+const goCall = () => {
+  const tel = detail.value?.provider?.phone
+  if (!tel) return
+  window.location.href = `tel:${String(tel).replace(/\D/g,'')}`
+}
+
+// 58 同城式：chip 标签整合
+const chipTags = computed(() => {
+  const base = ['无经验要求','五险一金','包住','包吃','周末双休','加班补助'].filter(t=> (detail.value?.welfare || []).includes(t) || ['无经验要求'].includes(t))
+  // 补充一些固定标签以增强观感
+  const extra = ['交通补助','房补','全勤500','班车接送']
+  return Array.from(new Set([...base, ...extra])).slice(0, 10)
+})
+
+const openMap = () => {
+  // 简化：目前仅提示，后续可接入地图
+  alert('地图暂未接入，后续提供内嵌地图查看')
+}
+
+
+const openAppQr = () => { showAppQr.value = true }
+const closeAppQr = () => { if (!appQrPinned.value) showAppQr.value = false }
+const toggleAppQr = () => { appQrPinned.value = !appQrPinned.value; showAppQr.value = appQrPinned.value }
+const setAppPlatform = (p) => { appQrPlatform.value = p }
+</script>
+
+<style scoped>
+.container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+.breadcrumbs { color: #777; font-size: 13px; padding: 12px 0; }
+.breadcrumbs a { color: #576b95; text-decoration: none; }
+.breadcrumbs .sep { margin: 0 6px; color: #bbb; }
+.breadcrumbs .current { color: #333; font-weight: 600; }
+
+.detail-layout { display: grid; grid-template-columns: 1fr 320px; gap: 16px; align-items: start; }
+.detail-title { margin: 8px 0; font-size: 22px; color: #333; }
+.detail-meta { display: flex; align-items: center; gap: 8px; color: #888; font-size: 13px; margin-bottom: 10px; }
+.detail-meta .price { color: #e55a00; font-weight: 700; font-size: 20px; }
+.detail-meta .unit { font-size: 12px; margin-left: 2px; color: #999; }
+.detail-meta .icon { width: 14px; height: 14px; margin-right: 2px; color: #ff6b35; }
+
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 8px; margin: 10px 0 16px; }
+.gallery-img { width: 100%; height: 160px; object-fit: cover; border-radius: 6px; border: 1px solid #eee; }
+
+.job-panel { padding-top: 6px; }
+.job-hero { display: grid; grid-template-columns: 1fr 360px; gap: 12px; align-items: start; }
+.job-title { margin: 0; font-size: 22px; color: #222; }
+.job-hero-meta { display: flex; align-items: center; color: #666; margin-top: 6px; font-size: 13px; }
+.job-hero-meta .meta-item { display: inline-flex; align-items: center; gap: 4px; position: relative; padding-right: 12px; margin-right: 12px; }
+.job-hero-meta .meta-item::after { content: '·'; position: absolute; right: 0; color: #bbb; }
+.job-hero-meta .meta-item:last-child { margin-right: 0; padding-right: 0; }
+.job-hero-meta .meta-item:last-child::after { display: none; }
+.job-hero-meta .salary { color: #e55a00; font-weight: 700; font-size: 20px; }
+.job-hero-meta .unit { font-size: 12px; margin-left: 2px; color: #999; }
+.job-cover { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; border: 1px solid #eee; }
+
+.job-keyfacts { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 14px; }
+.job-keyfacts .fact { background: #fff; border: 1px solid #f1f3f5; border-radius: 10px; padding: 10px 12px; }
+.job-keyfacts .k { color: #666; font-size: 12px; }
+.job-keyfacts .v { color: #222; font-weight: 600; margin-top: 2px; }
+
+.section-title { margin: 16px 0 8px; font-size: 16px; color: #333; font-weight: 600; }
+.job-desc .content { color: #555; }
+
+.job-gallery .env-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 8px; }
+.job-gallery .env-img { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; border: 1px solid #eee; }
+
+/* 响应式：中小屏将封面下移，信息靠左上 */
+@media (max-width: 1024px) {
+  .job-hero { grid-template-columns: 1fr; }
+  .job-cover { height: 200px; }
+}
+@media (max-width: 768px) {
+  .job-cover { height: 180px; }
+  .job-title { font-size: 20px; }
+  .job-hero-meta { font-size: 12px; }
+}
+
+/* 58 同城式块 */
+.job58-sub { margin: 8px 0 6px; font-size: 16px; color: #333; }
+.job58-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.job58-tags .chip { padding: 6px 10px; border: 1px solid #e9ecef; background: #fff; border-radius: 16px; font-size: 13px; color: #333; }
+.job58-brief { display: flex; gap: 18px; color: #666; font-size: 13px; align-items: center; margin: 8px 0; }
+.job58-location { display: flex; align-items: center; gap: 8px; color: #666; font-size: 13px; margin: 8px 0; }
+.job58-location .icon { width: 14px; height: 14px; color: #ff6b35; }
+.job58-location .map-link { color: #0b76e0; cursor: pointer; }
+.job58-actions { display: flex; align-items: center; gap: 10px; margin: 12px 0; }
+.apply58-btn { background: #ff6a00; color: #fff; border: none; border-radius: 8px; padding: 10px 16px; cursor: pointer; font-weight: 600; }
+.action-btn { background: #fff; color: #333; border: 1px solid #f1f3f5; border-radius: 8px; padding: 10px 16px; cursor: pointer; }
+
+.panel h3 { margin: 14px 0 8px; font-size: 16px; color: #333; }
+.panel .content { color: #555; line-height: 1.7; }
+.tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.tag { display: inline-block; padding: 2px 8px; background: #fff3e0; color: #e55a00; border: 1px solid #ffd8b0; border-radius: 12px; font-size: 12px; }
+
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+.info-item { display: flex; justify-content: space-between; gap: 8px; background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px 12px; }
+.info-item .label { color: #666; font-size: 13px; }
+.info-item .value { color: #333; font-weight: 600; }
+
+.detail-aside { position: sticky; top: 80px; }
+.provider-card { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 16px; }
+.provider-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-bottom: 8px; }
+.provider-name { font-weight: 600; color: #333; margin-bottom: 10px; }
+.contact-btn { width: 100%; background: #f3f4f6; color: #333; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.contact-btn:hover { background: #e9ecef; }
+.contact-btn .icon { width: 16px; height: 16px; color: #666; }
+
+
+.safety-tips { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 12px; }
+.safety-tips h4 { margin: 0 0 8px 0; font-size: 14px; color: #333; }
+.safety-tips ul { margin: 0; padding-left: 18px; color: #666; font-size: 13px; }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; z-index: 3000; }
+.contact-modal { width: 360px; background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #eee; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid #eee; }
+.modal-content { padding: 14px; }
+.close-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: #999; }
+.contact-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; color: #333; }
+.contact-row .icon { width: 16px; height: 16px; color: #ff6b35; }
+.contact-row .label { color: #666; min-width: 64px; font-size: 13px; }
+.contact-row .value { color: #333; font-weight: 600; }
+
+.app-btn { width: 100%; background: #f3f4f6; color: #333; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px 12px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.app-btn:hover { background: #e9ecef; }
+.app-btn.strong { background: #ff6a00; border-color: #ff6a00; color: #fff; }
+.app-btn.strong .icon { color: #fff; }
+.qr-popover { position: absolute; left: 50%; transform: translateX(-50%); margin-top: 8px; background: #ffffff; border: 1px solid rgba(0,0,0,0.08); border-radius: 12px; padding: 10px; box-shadow: 0 12px 28px rgba(0,0,0,0.14); z-index: 10; }
+.qr-card { padding: 8px 8px 12px; text-align: center; }
+.qr-image { width: 180px; height: 180px; border-radius: 10px; box-shadow: 0 6px 18px rgba(0,0,0,.08); }
+.qr-box { position: relative; display: inline-block; }
+.corner { position: absolute; width: 20px; height: 20px; border-color: var(--primary-color, #FF6A00); }
+.corner.tl { left: -8px; top: -8px; border-left: 2px solid; border-top: 2px solid; }
+.corner.tr { right: -8px; top: -8px; border-right: 2px solid; border-top: 2px solid; }
+.corner.bl { left: -8px; bottom: -8px; border-left: 2px solid; border-bottom: 2px solid; }
+.corner.br { right: -8px; bottom: -8px; border-right: 2px solid; border-bottom: 2px solid; }
+.qr-title { margin-top: 8px; font-size: 14px; font-weight: 700; color: #1f2937; }
+.download-actions { display: flex; gap: 10px; justify-content: center; margin-top: 8px; }
+.btn-download { display: inline-block; padding: 7px 12px; border: 1px solid var(--primary-color, #FF6A00); color: var(--primary-color, #FF6A00); border-radius: 6px; font-size: 13px; text-decoration: none; min-width: 96px; }
+.btn-download.active, .btn-download:hover { background: var(--primary-color, #FF6A00); color: #fff; }
+
+/* 相似推荐 */
+.recommend { max-width: 1200px; margin: 0 auto; padding: 0 16px 80px; }
+.rec-header { margin: 16px 0 10px; font-weight: 700; color: #333; }
+.rec-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 12px; }
+.rec-item { display: grid; grid-template-columns: 120px 1fr; gap: 10px; align-items: center; border: 1px solid #f1f3f5; border-radius: 8px; padding: 10px; cursor: pointer; }
+.rec-item:hover { box-shadow: 0 4px 14px rgba(0,0,0,.06); }
+.rec-thumb { width: 120px; height: 80px; object-fit: cover; border-radius: 6px; }
+.rec-title { font-size: 14px; color: #333; margin-bottom: 4px; }
+.rec-meta { color: #e55a00; font-weight: 700; }
+
+/* 按钮通用（悬浮条已移除） */
+.btn { padding: 10px 14px; border: 1px solid #f1f3f5; border-radius: 8px; background: #fff; cursor: pointer; }
+.btn.primary { background: #ff6b35; color: #fff; border-color: #ff6b35; }
+.btn .icon { width: 16px; height: 16px; margin-right: 6px; }
+</style>
+

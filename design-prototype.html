@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知马网 - 设计原型图</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #FFFFFF;
+            color: #333333;
+            line-height: 1.6;
+        }
+
+        /* 色彩变量 */
+        :root {
+            --primary-color: #FF6A00;
+            --secondary-color: #FF8533;
+            --bg-color: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #E5E5E5;
+            --hover-bg: #FFF5F0;
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            background: var(--bg-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding: 12px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(255, 106, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .search-box {
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            outline: none;
+            width: 200px;
+        }
+
+        .search-box:focus {
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+        }
+
+        /* 页面选择器 */
+        .page-selector {
+            background: var(--hover-bg);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-selector h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .page-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .page-tab {
+            padding: 10px 20px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-tab:hover,
+        .page-tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* 页面内容 */
+        .page-content {
+            display: none;
+            padding: 30px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        /* 首页样式 */
+        .homepage {
+            background: linear-gradient(135deg, #FFF5F0 0%, #FFFFFF 100%);
+        }
+
+        .hero-section {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+
+        .hero-section h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .hero-section p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(255, 106, 0, 0.1);
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 24px;
+            color: white;
+        }
+
+        /* 资讯新闻页面样式 */
+        .news-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr 300px;
+            gap: 30px;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+
+        .sidebar h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .category-list {
+            list-style: none;
+        }
+
+        .category-list li {
+            padding: 10px 0;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .category-list li:hover {
+            color: var(--primary-color);
+        }
+
+        .article-list {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .article-item {
+            padding: 25px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .article-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .article-item:last-child {
+            border-bottom: none;
+        }
+
+        .article-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .article-meta {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .article-summary {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 便民服务页面样式 */
+        .service-header {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .service-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .service-posts {
+            display: grid;
+            gap: 20px;
+        }
+
+        .service-post {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .post-time {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* 知马圈页面样式 */
+        .circle-tabs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .circle-tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .circle-tab:hover,
+        .circle-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .circle-content {
+            display: none;
+        }
+
+        .circle-content.active {
+            display: block;
+        }
+
+        /* 生活分享区域 */
+        .lifestyle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .lifestyle-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .lifestyle-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-image {
+            height: 200px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .card-tags {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .tag {
+            background: var(--hover-bg);
+            color: var(--primary-color);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        /* 交友区域 */
+        .dating-interface {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 48px;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .profile-info {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .action-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-pass {
+            background: #ff4458;
+            color: white;
+        }
+
+        .btn-like {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+            }
+
+            .search-box {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .news-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .hero-section h1 {
+                font-size: 36px;
+            }
+
+            .feature-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .page-tabs {
+                justify-content: flex-start;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">🐎 知马网</div>
+            <ul class="nav-menu">
+                <li><a href="#" class="active">首页</a></li>
+                <li><a href="#">资讯新闻</a></li>
+                <li><a href="#">便民服务</a></li>
+                <li><a href="#">知马圈</a></li>
+            </ul>
+            <div class="nav-actions">
+                <input type="text" class="search-box" placeholder="搜索内容...">
+                <button class="btn-primary">登录</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+        <!-- 页面选择器 -->
+        <div class="page-selector">
+            <h2>知马网设计原型预览</h2>
+            <div class="page-tabs">
+                <div class="page-tab active" data-page="homepage">首页设计</div>
+                <div class="page-tab" data-page="news">资讯新闻</div>
+                <div class="page-tab" data-page="services">便民服务</div>
+                <div class="page-tab" data-page="circles">知马圈</div>
+            </div>
+        </div>
+
+        <!-- 首页内容 -->
+        <div class="page-content active homepage" id="homepage">
+            <div class="hero-section">
+                <h1>🐎 知马网</h1>
+                <p>马来西亚华人信息集散平台 - 连接你我，共建家园</p>
+                <button class="btn-primary" style="font-size: 18px; padding: 12px 30px;">立即加入</button>
+            </div>
+
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <div class="feature-icon">📰</div>
+                    <h3>资讯新闻</h3>
+                    <p>最新的马来西亚新闻资讯，政策解读，深度访谈，让您第一时间了解重要信息</p>
+                    <button class="btn-primary" style="margin-top: 15px;">进入资讯</button>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛍️</div>
+                    <h3>便民服务</h3>
+                    <p>二手交易，租房买房，求职招聘，投资创业，满足您的各种生活需求</p>
+                    <button class="btn-primary" style="margin-top: 15px;">查看服务</button>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h3>知马圈</h3>
+                    <p>生活分享，结交朋友，摄影旅游，美食探店，丰富多彩的社交体验</p>
+                    <button class="btn-primary" style="margin-top: 15px;">加入社区</button>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>精准匹配</h3>
+                    <p>基于位置和兴趣的智能推荐，帮您快速找到志同道合的朋友</p>
+                    <button class="btn-primary" style="margin-top: 15px;">开始匹配</button>
+                </div>
+            </div>
+
+            <div style="text-align: center; padding: 40px 0; background: white; border-radius: 10px; margin-top: 30px;">
+                <h2 style="color: var(--primary-color); margin-bottom: 20px;">热门内容</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <div style="padding: 20px; border: 1px solid var(--border-color); border-radius: 10px;">
+                        <h4>📈 马来西亚投资政策更新</h4>
+                        <p style="color: var(--text-secondary); margin-top: 10px;">最新投资政策解读...</p>
+                    </div>
+                    <div style="padding: 20px; border: 1px solid var(--border-color); border-radius: 10px;">
+                        <h4>🏠 吉隆坡租房推荐</h4>
+                        <p style="color: var(--text-secondary); margin-top: 10px;">优质房源信息...</p>
+                    </div>
+                    <div style="padding: 20px; border: 1px solid var(--border-color); border-radius: 10px;">
+                        <h4>🍜 槟城美食攻略</h4>
+                        <p style="color: var(--text-secondary); margin-top: 10px;">地道美食推荐...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 资讯新闻页面 -->
+        <div class="page-content" id="news">
+            <div class="news-layout">
+                <!-- 左侧分类 -->
+                <div class="sidebar">
+                    <h3>📂 分类导航</h3>
+                    <ul class="category-list">
+                        <li>🔥 热门新闻</li>
+                        <li>🏛️ 政策解读</li>
+                        <li>💼 商业财经</li>
+                        <li>🎓 教育留学</li>
+                        <li>⚖️ 法律咨询</li>
+                        <li>🏥 医疗健康</li>
+                        <li>🚗 交通出行</li>
+                        <li>🎭 文化活动</li>
+                    </ul>
+                </div>
+
+                <!-- 主内容区 -->
+                <div class="article-list">
+                    <div class="article-item">
+                        <div class="article-title">马来西亚2025年度预算案重点解读</div>
+                        <div class="article-meta">
+                            <span>📅 2025-03-15</span> • 
+                            <span>👤 政策分析师</span> • 
+                            <span>👀 2.3K 阅读</span> • 
+                            <span>💬 45 评论</span>
+                        </div>
+                        <div class="article-summary">
+                            2025年马来西亚预算案公布，重点关注数字经济发展、绿色能源转型以及中小企业扶持政策。本文将为您详细解读预算案中与华人社区相关的重要内容...
+                        </div>
+                    </div>
+                    
+                    <div class="article-item">
+                        <div class="article-title">吉隆坡公共交通系统全面升级计划启动</div>
+                        <div class="article-meta">
+                            <span>📅 2025-03-14</span> • 
+                            <span>👤 交通记者</span> • 
+                            <span>👀 1.8K 阅读</span> • 
+                            <span>💬 32 评论</span>
+                        </div>
+                        <div class="article-summary">
+                            吉隆坡市政府宣布将在未来三年内投资150亿令吉升级公共交通系统，包括新增轻轨线路、优化巴士网络以及引入智能交通管理系统...
+                        </div>
+                    </div>
+
+                    <div class="article-item">
+                        <div class="article-title">马来西亚华文教育发展现状与前景分析</div>
+                        <div class="article-meta">
+                            <span>📅 2025-03-13</span> • 
+                            <span>👤 教育专家</span> • 
+                            <span>👀 3.1K 阅读</span> • 
+                            <span>💬 67 评论</span>
+                        </div>
+                        <div class="article-summary">
+                            随着中马关系的不断深化，马来西亚华文教育迎来新的发展机遇。本文分析了当前华文教育的现状、面临的挑战以及未来发展方向...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧推荐 -->
+                <div class="sidebar">
+                    <h3>🔥 热门推荐</h3>
+                    <div style="margin-bottom: 30px;">
+                        <div style="padding: 15px 0; border-bottom: 1px solid var(--border-color);">
+                            <h4 style="font-size: 14px; margin-bottom: 5px;">马币汇率波动分析</h4>
+                            <p style="font-size: 12px; color: var(--text-secondary);">👀 1.2K</p>
+                        </div>
+                        <div style="padding: 15px 0; border-bottom: 1px solid var(--border-color);">
+                            <h4 style="font-size: 14px; margin-bottom: 5px;">新山房价趋势报告</h4>
+                            <p style="font-size: 12px; color: var(--text-secondary);">👀 956</p>
+                        </div>
+                        <div style="padding: 15px 0;">
+                            <h4 style="font-size: 14px; margin-bottom: 5px;">槟城旅游业复苏</h4>
+                            <p style="font-size: 12px; color: var(--text-secondary);">👀 743</p>
+                        </div>
+                    </div>
+
+                    <h3>👥 活跃作者</h3>
+                    <div>
+                        <div style="padding: 10px 0; display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 30px; height: 30px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">李</div>
+                            <div>
+                                <h4 style="font-size: 14px;">李政策</h4>
+                                <p style="font-size: 12px; color: var(--text-secondary);">政策分析师</p>
+                            </div>
+                        </div>
+                        <div style="padding: 10px 0; display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 30px; height: 30px; background: var(--secondary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">王</div>
+                            <div>
+                                <h4 style="font-size: 14px;">王记者</h4>
+                                <p style="font-size: 12px; color: var(--text-secondary);">资深记者</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 便民服务页面 -->
+        <div class="page-content" id="services">
+            <div class="service-header">
+                <h2 style="color: var(--primary-color); margin-bottom: 20px;">🛍️ 便民服务</h2>
+                <div class="service-filters">
+                    <div class="filter-btn active">全部</div>
+                    <div class="filter-btn">二手交易</div>
+                    <div class="filter-btn">租房买房</div>
+                    <div class="filter-btn">求职招聘</div>
+                    <div class="filter-btn">投资创业</div>
+                    <div class="filter-btn">生活服务</div>
+                </div>
+                <button class="btn-primary">📝 发布信息</button>
+            </div>
+
+            <div class="service-posts">
+                <div class="service-post">
+                    <div class="post-header">
+                        <div class="user-info">
+                            <div class="user-avatar">张</div>
+                            <div>
+                                <strong>张先生</strong>
+                                <div class="post-time">2小时前 • 吉隆坡</div>
+                            </div>
+                        </div>
+                        <span style="background: var(--primary-color); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px;">二手交易</span>
+                    </div>
+                    <h3 style="margin-bottom: 15px;">🚗 出售2020年本田思域，车况良好</h3>
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 15px;">
+                        车辆基本信息：2020年购入，行驶里程3.5万公里，定期保养，无事故记录。车内外整洁，空调、音响等设备运行正常。因工作调动需要出售，诚意出售价格面议。
+                    </p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; color: var(--text-secondary); font-size: 14px;">
+                        <span>💰 价格：RM 85,000</span>
+                        <div>
+                            <span style="margin-right: 15px;">👀 123 浏览</span>
+                            <span style="margin-right: 15px;">❤️ 12 收藏</span>
+                            <button style="background: var(--primary-color); color: white; border: none; padding: 6px 12px; border-radius: 15px; cursor: pointer;">联系</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-post">
+                    <div class="post-header">
+                        <div class="user-info">
+                            <div class="user-avatar">李</div>
+                            <div>
+                                <strong>李女士</strong>
+                                <div class="post-time">5小时前 • 槟城</div>
+                            </div>
+                        </div>
+                        <span style="background: #4CAF50; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px;">租房信息</span>
+                    </div>
+                    <h3 style="margin-bottom: 15px;">🏠 槟城市中心精装公寓出租</h3>
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 15px;">
+                        位置优越，交通便利，临近商场和地铁站。公寓设施齐全，包含家具家电，拎包入住。小区环境优美，24小时保安，健身房、游泳池等配套设施完善。
+                    </p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; color: var(--text-secondary); font-size: 14px;">
+                        <span>💰 月租：RM 2,800</span>
+                        <div>
+                            <span style="margin-right: 15px;">👀 89 浏览</span>
+                            <span style="margin-right: 15px;">❤️ 8 收藏</span>
+                            <button style="background: var(--primary-color); color: white; border: none; padding: 6px 12px; border-radius: 15px; cursor: pointer;">联系</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-post">
+                    <div class="post-header">
+                        <div class="user-info">
+                            <div class="user-avatar">王</div>
+                            <div>
+                                <strong>王总</strong>
+                                <div class="post-time">1天前 • 新山</div>
+                            </div>
+                        </div>
+                        <span style="background: #9C27B0; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px;">投资创业</span>
+                    </div>
+                    <h3 style="margin-bottom: 15px;">💼 科技初创公司寻找合伙人</h3>
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 15px;">
+                        专注于电商平台开发，目前产品已进入测试阶段，寻找有技术背景或市场运营经验的合伙人。我们有明确的商业计划和发展路径，欢迎志同道合的朋友加入。
+                    </p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; color: var(--text-secondary); font-size: 14px;">
+                        <span>💰 投资：面议</span>
+                        <div>
+                            <span style="margin-right: 15px;">👀 234 浏览</span>
+                            <span style="margin-right: 15px;">❤️ 19 收藏</span>
+                            <button style="background: var(--primary-color); color: white; border: none; padding: 6px 12px; border-radius: 15px; cursor: pointer;">联系</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 知马圈页面 -->
+        <div class="page-content" id="circles">
+            <div style="margin-bottom: 30px;">
+                <h2 style="color: var(--primary-color); margin-bottom: 20px;">🎯 知马圈</h2>
+                <div class="circle-tabs">
+                    <div class="circle-tab active" data-circle="lifestyle">📸 生活分享</div>
+                    <div class="circle-tab" data-circle="dating">💕 交友匹配</div>
+                </div>
+            </div>
+
+            <!-- 生活分享内容 -->
+            <div class="circle-content active" id="lifestyle">
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <div class="filter-btn active">全部</div>
+                        <div class="filter-btn">📸 摄影圈</div>
+                        <div class="filter-btn">🗺️ 旅游圈</div>
+                        <div class="filter-btn">🍜 美食区</div>
+                        <div class="filter-btn">🛒 购物分享</div>
+                        <div class="filter-btn">📚 学习分享</div>
+                    </div>
+                    <button class="btn-primary">📝 发布分享</button>
+                </div>
+
+                <div class="lifestyle-grid">
+                    <div class="lifestyle-card">
+                        <div class="card-image">📸 槟城夜景</div>
+                        <div class="card-content">
+                            <div class="card-title">槟城乔治市夜景摄影分享</div>
+                            <div class="card-tags">
+                                <span class="tag">摄影</span>
+                                <span class="tag">槟城</span>
+                                <span class="tag">夜景</span>
+                            </div>
+                            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 15px;">
+                                昨晚在槟城乔治市拍摄的夜景，古老的建筑在灯光映衬下格外迷人...
+                            </p>
+                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--text-secondary);">
+                                <span>👤 摄影师小李</span>
+                                <div>
+                                    <span style="margin-right: 10px;">❤️ 128</span>
+                                    <span>💬 23</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lifestyle-card">
+                        <div class="card-image">🍜 美食探店</div>
+                        <div class="card-content">
+                            <div class="card-title">吉隆坡隐藏美食探店记</div>
+                            <div class="card-tags">
+                                <span class="tag">美食</span>
+                                <span class="tag">吉隆坡</span>
+                                <span class="tag">探店</span>
+                            </div>
+                            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 15px;">
+                                在茨厂街发现了一家开了30年的老店，这里的云吞面真的太正宗了...
+                            </p>
+                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--text-secondary);">
+                                <span>👤 美食达人</span>
+                                <div>
+                                    <span style="margin-right: 10px;">❤️ 89</span>
+                                    <span>💬 15</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lifestyle-card">
+                        <div class="card-image">🗺️ 旅行记录</div>
+                        <div class="card-content">
+                            <div class="card-title">兰卡威三天两夜自由行攻略</div>
+                            <div class="card-tags">
+                                <span class="tag">旅游</span>
+                                <span class="tag">兰卡威</span>
+                                <span class="tag">攻略</span>
+                            </div>
+                            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 15px;">
+                                详细的兰卡威旅行攻略，包括住宿推荐、景点路线、美食指南...
+                            </p>
+                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--text-secondary);">
+                                <span>👤 旅行小达</span>
+                                <div>
+                                    <span style="margin-right: 10px;">❤️ 156</span>
+                                    <span>💬 34</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 交友匹配内容 -->
+            <div class="circle-content" id="dating">
+                <div class="dating-interface">
+                    <div style="margin-bottom: 30px; text-align: center;">
+                        <h3 style="color: var(--primary-color); margin-bottom: 15px;">💕 寻找你的另一半</h3>
+                        <p style="color: var(--text-secondary);">左滑跳过，右滑喜欢，开始你的缘分之旅</p>
+                    </div>
+
+                    <div class="profile-card">
+                        <div class="profile-avatar">👨</div>
+                        <div class="profile-name">Alex Chen</div>
+                        <div class="profile-info">
+                            <p>📍 吉隆坡 • 28岁 • 软件工程师</p>
+                            <p style="margin-top: 10px;">🎯 兴趣：摄影、旅行、美食</p>
+                            <p style="margin-top: 10px; text-align: left; color: var(--text-primary);">
+                                "热爱生活，喜欢探索新鲜事物。周末经常去摄影或者尝试新餐厅。希望能遇到一个有趣的灵魂，一起分享生活的美好。"
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="action-btn btn-pass">✖️</button>
+                        <button class="action-btn btn-like">💖</button>
+                    </div>
+
+                    <div style="margin-top: 30px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                        <h4 style="color: var(--primary-color); margin-bottom: 15px;">🎯 筛选条件</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 14px;">
+                            <div>
+                                <label>年龄范围</label>
+                                <input type="range" style="width: 100%; margin-top: 5px;">
+                                <span style="color: var(--text-secondary);">25-35岁</span>
+                            </div>
+                            <div>
+                                <label>距离</label>
+                                <input type="range" style="width: 100%; margin-top: 5px;">
+                                <span style="color: var(--text-secondary);">50公里内</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <label style="display: block; margin-bottom: 5px;">兴趣标签</label>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <span class="tag">摄影</span>
+                                <span class="tag">旅行</span>
+                                <span class="tag">美食</span>
+                                <span class="tag">运动</span>
+                                <span class="tag">音乐</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面切换功能
+        document.querySelectorAll('.page-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // 移除所有活跃状态
+                document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.page-content').forEach(c => c.classList.remove('active'));
+                
+                // 添加当前活跃状态
+                this.classList.add('active');
+                document.getElementById(this.dataset.page).classList.add('active');
+            });
+        });
+
+        // 知马圈标签切换
+        document.querySelectorAll('.circle-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.circle-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.circle-content').forEach(c => c.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById(this.dataset.circle).classList.add('active');
+            });
+        });
+
+        // 筛选按钮交互
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 交友卡片交互
+        document.querySelector('.btn-like')?.addEventListener('click', function() {
+            alert('💖 已喜欢！等待匹配结果...');
+        });
+
+        document.querySelector('.btn-pass')?.addEventListener('click', function() {
+            alert('⏭️ 已跳过，为您推荐下一位...');
+        });
+    </script>
+</body>
+</html>

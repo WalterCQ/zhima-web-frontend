@@ -1,0 +1,50 @@
+{
+  "name": "zhimawang",
+  "version": "1.0.0",
+  "description": "知马网 - 马来西亚华人信息集散平台",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "format": "prettier --write src/",
+    "gen:placeholder:news": "node scripts/generate-placeholder-news.js"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "axios": "^1.6.0",
+    "dayjs": "^1.11.10",
+    "element-plus": "^2.4.0",
+    "lodash-es": "^4.17.21",
+    "lucide-vue-next": "^0.543.0",
+    "pinia": "^2.1.7",
+    "qrcode": "^1.5.4",
+    "vue": "^3.4.0",
+    "vue-router": "^4.2.5"
+  },
+  "devDependencies": {
+    "@fullhuman/postcss-purgecss": "^7.0.2",
+    "@vitejs/plugin-vue": "^5.0.0",
+    "@vue/eslint-config-prettier": "^9.0.0",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^8.55.0",
+    "eslint-plugin-vue": "^9.19.0",
+    "jimp": "^0.22.10",
+    "prettier": "^3.1.0",
+    "sass": "^1.69.0",
+    "terser": "^5.44.0",
+    "unplugin-auto-import": "^0.17.0",
+    "unplugin-vue-components": "^0.26.0",
+    "vite": "^5.0.0"
+  },
+  "keywords": [
+    "vue3",
+    "vite",
+    "malaysia",
+    "chinese-community",
+    "social-platform"
+  ],
+  "author": "知马网团队",
+  "license": "MIT"
+}
